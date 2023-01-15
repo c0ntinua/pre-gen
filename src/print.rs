@@ -1,91 +1,42 @@
 use crate::symbol::*;
 use crate::cursor::*;
 use crate::state::*;
+use crate::file::*;
 
-pub fn print_symbol(symbol : &Symbol) {
-    print!("  ");
-    for i in symbol {
-        match i {
-            0 => print!("O"),
-            1 => print!("|"),
-            2 => print!("@"),
-            _ => print!("?"),
-        }
-    }
-    print!("  ");
-}
-pub fn print_symbol_tight(symbol : &Symbol) {
-    //print!(" ");
-    for i in symbol {
-        match i {
-            0 => print!("O"),
-            1 => print!("|"),
-            2 => print!("@"),
-            _ => print!("?"),
-        }
-    }
-}
 
-pub fn print_code(code : &Code) {
+
+pub fn print_response(r : &Response, alphabet : &str) {
+    let b = 100;
+    set_color(b,b,b);
+    print!(" <");
     set_color(255,0,0);
-    print!("(");
+    print!(" {}", &symbol_as_string(&r.read,alphabet));
     set_color(255,255,0);
-    for s in code {
-        print_symbol(s);
-    }
-    set_color(255,0,0);
-    print!(")");
-    print!("\n");
+    print!(" {} ", &symbol_as_string(&r.write,alphabet));
+    set_color(0,255,0);
+    print!("{} ",&r.go);
+    set_color(b,b,b);
+    print!("> ");
     set_color(255,255,255);
 }
-
-pub fn print_state(state : &State) {
-    set_color(255,255,255);
-    print!("(");
-    for r in state {
-        set_color(255,0,0);
-        print_symbol_tight(&r.read);
-        set_color(255,255,0);
-        
-        print_symbol_tight(&r.write);
-        
-        set_color(0,255,255);
-        print!("{:3}",r.go);
-        print!("    ");
+pub fn print_state(s : &State, alphabet : &str) {
+    for r in s {
+        print_response(r, alphabet);
     }
-    set_color(255,255,255);
-    print!(")");
 }
-pub fn print_state_tight(s : &State) {
-    set_color(255,255,255);
-    print!("[");
-    for i in 0..s.len() {
-        set_color(255,255,255);
-        print!("(");
-        set_color(255,0,0);
-        print_symbol_tight(&s[i].read);
-        set_color(255,255,255);
-        print!(",");
-        set_color(255,255,0);
-        print_symbol_tight(&s[i].write);
-        set_color(255,255,255);
-        print!(",");
-        set_color(0,255,255);
-        print!("{}",&s[i].go);
-        set_color(255,255,255);
-        print!(")");
-        if i < s.len() - 1 {
-            print!(",");
-        }
-        //print!("    ");
-    }
-    set_color(255,255,255);
-    print!("]");
-}
-
-pub fn print_key(key : &Key) {
-    for s in key {
-        print_state_tight(&s);
+pub fn print_key(k : &Key, alphabet : &str) {
+    for s in k {
+        print_state(s, alphabet);
         print!("\n");
     }
 }
+pub fn symbol_as_string(symbol : &Symbol, alphabet : &str) -> String {
+    let mut string = "".to_string();
+    for i in symbol {
+        let j = *i as usize;
+        string.push(alphabet.chars().nth(j).unwrap());
+    }
+    string
+}
+
+
